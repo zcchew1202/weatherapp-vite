@@ -17,7 +17,7 @@
   </template>
 
   <button @click="getForecast">See forecast</button>
-    <template v-if="clicked">
+    <template v-if="data">
 		<tr>
 			<th>Date</th>
 			<th>Temp</th>
@@ -54,7 +54,7 @@ const state = reactive({
   temperature: "",
   wind: "",
   coord: "",
-  clicked: false
+  data: ""
 });
 const onChange = (event) => {
   // let location = event.target.value.split(" ");
@@ -76,7 +76,7 @@ const onChange = (event) => {
 };
 const getForecast = () => {
 	state.clicked = true;
-// 	axios.get(`https://api.openweathermap.org/data/2.5/onecall?id=${state.coord}&exclude=hourly&appid=538882fc8387290c6cee83f313a6acf5&units=metric`).then((response) => {
+// 	axios.get(`https://api.openweathermap.org/data/2.5/onecall?id=${state.coord}&exclude=minutely&appid=538882fc8387290c6cee83f313a6acf5&units=metric`).then((response) => {
 // 		console.log(response.data)
 // });
 }
