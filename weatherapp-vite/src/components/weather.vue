@@ -2,7 +2,13 @@
   <div id="v-model-select" class="demo">
     <select v-model="selected" @change="onChange($event)">
       <option disabled value="">Please select one</option>
-      <option v-for="city in $options.cities" :key="city.id" :value="city.id">
+      <option
+        v-for="city in $options.cities"
+        :key="city.id"
+        :value="
+          city.id + ` ${city.coord.lat.toString()} ${city.coord.lon.toString()}`
+        "
+      >
         {{ city.name + `, ${city.country}` }}
       </option>
     </select>
@@ -16,24 +22,27 @@
     <p>{{ state.wind }} m/s</p>
   </template>
 
-  <button @click="getForecast">See forecast</button>
-    <template v-if="data">
-		<tr>
-			<th>Date</th>
-			<th>Temp</th>
-			<th>Min Temp</th>
-			<th>Max Temp</th>
-			<th>Wind</th>
-			<th>Description</th>
-		</tr>
-		<!-- do a for loop to generate table data for each day-->
-		<tr>
-			<!-- another for loop here for each hour -->
-			<td></td>
-		</tr>
-		  </template>
-
-
+  <button @click="getForecast">Get forecast</button>
+  <template v-if="!state.hide">
+    <button @click="state.hide = true">Show/hide forecast</button>
+      <table style="width: 100%">
+        <tr>
+          <th>Time</th>
+          <th>Temp</th>
+          <th>Feels Like</th>
+          <th>Wind Speed</th>
+          <th>Humidity</th>
+        </tr>
+        
+        <tr v-for="hourly in state.data.hourly" :key="hourly.dt" :value="hourly.dt">
+          <td>{{hourly.dt}}</td>
+          <td>{{hourly.temp}}&#176;C</td>
+          <td>{{hourly.feels_like}}&#176;C</td>
+          <td>{{hourly.wind_speed}}m/s</td>
+          <td>{{hourly.humidity}}%</td>
+        </tr>
+      </table>
+  </template>
 </template>
 
 <script>
@@ -54,30 +63,66 @@ const state = reactive({
   temperature: "",
   wind: "",
   coord: "",
-  data: ""
+  data: "",
+  hide: true,
+  numButtons: 0,
+  hourlyForecast: {},
+  clickedButton: ""
 });
 const onChange = (event) => {
-  // let location = event.target.value.split(" ");
-  // let cityName = location[0]
-  // console.log(cities)
-	console.log(event.target)
-	state.coord = event.target.value.coord;
+  console.log(event.target.value);
+  const params = event.target.value.split(" ");
+
+  state.coord = {
+    lat: params[1],
+    lon: params[2],
+  };
   axios
     .get(
-      `http://api.openweathermap.org/data/2.5/weather?id=${event.target.value}&appid=538882fc8387290c6cee83f313a6acf5&units=metric`
+      `https://api.openweathermap.org/data/2.5/onecall?lat=${params[1]}&lon=${params[2]}&exclude=minutely&appid=538882fc8387290c6cee83f313a6acf5&units=metric`
     )
     .then((response) => {
-      //   clouds = response.data;
-      state.clouds = response.data.weather[0].description;
-      state.temperature = response.data.main.temp;
-      state.wind = response.data.wind.speed;
+      state.clouds = response.data.current.weather[0].description;
+      state.temperature = response.data.current.temp;
+      state.wind = response.data.current.wind_speed;
       console.log(response.data);
+
+      state.data = response.data;
+      toDateTime(state.data.daily, "date");
+      toDateTime(state.data.hourly, "time");
+      for (let day of state.data.daily) {
+        state.hourlyForecast[day.dt] = {times:[],show: false};
+      }
+      for (let hour of state.data.hourly) {
+        const date = new Date(hour.dt).toDateString();
+        if(state.hourlyForecast.hasOwnProperty(date)) {
+          const time = new Date(hour.dt).toTimeString();
+          state.hourlyForecast[date].times.push(time);
+        }
+      }
+      console.log(state.hourlyForecast);
     });
 };
-const getForecast = () => {
-	state.clicked = true;
-// 	axios.get(`https://api.openweathermap.org/data/2.5/onecall?id=${state.coord}&exclude=minutely&appid=538882fc8387290c6cee83f313a6acf5&units=metric`).then((response) => {
-// 		console.log(response.data)
-// });
+function toDateTime(forecasts, format) {
+    forecasts.forEach((element) => {
+      let realTime = element.dt * 1000;
+      if (format === "date") {
+        realTime = new Date(realTime).toDateString();
+      } else if (format === "time") {
+        realTime = new Date(realTime).toString();
+      }
+      element.dt = realTime;
+    });
 }
+const showDailyForecast = () => {
+  console.log(event.target.value)
+  state.clickedButton = event.target.value;
+  state.hourlyForecast[event.target.value].show = true;
+  
+};
+const getForecast = () => {
+  state.hide = false;
+  // convert epochs to date/time
+  
+};
 </script>

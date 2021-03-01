@@ -22,11 +22,21 @@
     {
         "id": 6094817,
         "name": "Ottawa",
-        "country": "CA"
+        "state": "",
+        "country": "CA",
+        "coord": {
+            "lon": -75.69812,
+            "lat": 45.411171
+        }
     },
     {
         "id": 1850147,
         "name": "Tokyo",
-        "country": "JP"
+        "state": "",
+        "country": "JP",
+        "coord": {
+            "lon": 139.691711,
+            "lat": 35.689499
+        }
     }
 ]
