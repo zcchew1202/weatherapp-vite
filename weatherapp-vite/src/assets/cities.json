@@ -1,0 +1,32 @@
+[
+    {
+        "id": 6167865,
+        "name": "Toronto",
+        "state": "",
+        "country": "CA",
+        "coord": {
+            "lon": -79.416298,
+            "lat": 43.700111
+        }
+    },
+    {
+        "id": 1733046,
+        "name": "Kuala Lumpur",
+        "state": "",
+        "country": "MY",
+        "coord": {
+            "lon": 101.686531,
+            "lat": 3.14309
+        }
+    },
+    {
+        "id": 6094817,
+        "name": "Ottawa",
+        "country": "CA"
+    },
+    {
+        "id": 1850147,
+        "name": "Tokyo",
+        "country": "JP"
+    }
+]
